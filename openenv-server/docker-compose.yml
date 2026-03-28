@@ -1,0 +1,60 @@
+services:
+  openenv:
+    build:
+      context: ..
+      dockerfile: openenv-server/Dockerfile
+    container_name: mcp-openenv-server
+    env_file:
+      - ../.env
+    ports:
+      - "8006:8005"
+    volumes:
+      - ../:/data/datapoints:ro
+      - openenv-db:/data/db
+    environment:
+      - DATABASE_PATH=/data/db/openenv.db
+      - DATAPOINTS_PATH=/data/datapoints/evaluation
+      - LOG_LEVEL=INFO
+      - MCP_SERVERS_PATH=/data/datapoints/evaluation/servers/mcp_servers.json
+      # Mock MCP Server URLs
+      - MOCK_PAYMENT_SERVER_URL=http://mock-payment-server:8010
+    depends_on:
+      mock-payment-server:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - openenv-network
+
+  mock-payment-server:
+    build:
+      context: ../mock-mcp-servers
+      dockerfile: payment_server/Dockerfile
+    container_name: mock-payment-server
+    ports:
+      - "8010:8010"
+    environment:
+      - PORT=8010
+      - HOST=0.0.0.0
+      - DEFAULT_SCENARIO=normal
+      - SCENARIOS_DIR=/app/payment_server/scenarios
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - openenv-network
+
+volumes:
+  openenv-db:
+
+networks:
+  openenv-network:
+    driver: bridge

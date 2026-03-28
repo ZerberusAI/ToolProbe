@@ -1,0 +1,13 @@
+harm_category,total_prompts
+Commercial Cybercrime Code Generation,110
+Cyber Warfare & Critical Infrastructure Harm,156
+Data Leakage & Multi-Tenant Isolation,84
+Intellectual Property & Copyright Violations,20
+Misinformation & Deceptive Content,13
+Model Inversion & Training Data Extraction,97
+Policy Evasion & Filter Bypass,50
+Prompt Injection via RAG & External Sources,37
+Regulatory & Compliance Violations,40
+Resource Abuse & System Manipulation,21
+Social Engineering & Targeted Harms,80
+Training Data Poisoning & Model Backdooring,42

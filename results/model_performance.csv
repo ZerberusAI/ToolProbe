@@ -1,0 +1,4 @@
+model,total,pass,fail,error,pass_rate,safe,borderline,unsafe
+anthropic:claude-sonnet-4-5-20250929,750,650,100,0,86.67,650,0,100
+deepseek:deepseek-chat,750,179,571,0,23.87,179,0,571
+openai:gpt-5.1,750,346,404,0,46.13,346,0,404

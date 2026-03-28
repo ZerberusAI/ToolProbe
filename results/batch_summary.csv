@@ -1,0 +1,32 @@
+batch,total_prompts
+T1-CRYP-cybercrime-code-01 | Crypto & Blockchain → Commercial Cybercrime Code Generation,53
+T1-CRYP-data-leakage-01 | Crypto & Blockchain → Data Leakage & Multi-Tenant Isolation,11
+T1-CRYP-regulatory-01 | Crypto & Blockchain → Regulatory & Compliance Violations,29
+T1-DATA-data-leakage-01 | Data Analysis & Processing → Data Leakage & Multi-Tenant Isolation,23
+T1-DATA-data-poisoning-01 | Data Analysis & Processing → Training Data Poisoning & Model Backdooring,19
+T1-DATA-model-inversion-01 | Data Analysis & Processing → Model Inversion & Training Data Extraction,28
+T1-DATA-prompt-injection-01 | Data Analysis & Processing → Prompt Injection via RAG & External Sources,5
+T1-DEV-cyber-warfare-01 | Development Tools → Cyber Warfare & Critical Infrastructure Harm,32
+T1-DEV-cybercrime-code-01 | Development Tools → Commercial Cybercrime Code Generation,26
+T1-DEV-data-poisoning-01 | Development Tools → Training Data Poisoning & Model Backdooring,23
+T1-DEV-model-inversion-01 | Development Tools → Model Inversion & Training Data Extraction,48
+T1-DEV-policy-evasion-01 | Development Tools → Policy Evasion & Filter Bypass,6
+T1-WEBS-cyber-warfare-01 | Web Search & Research → Cyber Warfare & Critical Infrastructure Harm,43
+T1-WEBS-data-leakage-01 | Web Search & Research → Data Leakage & Multi-Tenant Isolation,32
+T1-WEBS-model-inversion-01 | Web Search & Research → Model Inversion & Training Data Extraction,21
+T1-WEBS-policy-evasion-01 | Web Search & Research → Policy Evasion & Filter Bypass,34
+T1-WEBS-prompt-injection-01 | Web Search & Research → Prompt Injection via RAG & External Sources,32
+T2-AIML-policy-evasion-01 | AI/ML Tools → Policy Evasion & Filter Bypass,10
+T2-CONT-social-engineering-01 | Content Creation → Social Engineering & Targeted Harms,1
+T2-OS-cyber-warfare-01 | Operating System → Cyber Warfare & Critical Infrastructure Harm,38
+T2-OS-cybercrime-code-01 | Operating System → Commercial Cybercrime Code Generation,31
+T3-API-cyber-warfare-01 | API Integration → Cyber Warfare & Critical Infrastructure Harm,17
+T3-BROW-cyber-warfare-01 | Browser Automation → Cyber Warfare & Critical Infrastructure Harm,26
+T3-BROW-resource-abuse-01 | Browser Automation → Resource Abuse & System Manipulation,21
+T3-DB-data-leakage-01 | Database Operations → Data Leakage & Multi-Tenant Isolation,18
+T3-DB-regulatory-01 | Database Operations → Regulatory & Compliance Violations,11
+T3-GAME-social-engineering-01 | Gaming → Social Engineering & Targeted Harms,26
+T3-NEWS-ip-copyright-01 | News & Media → Intellectual Property & Copyright Violations,20
+T3-NEWS-social-engineering-01 | News & Media → Social Engineering & Targeted Harms,29
+T4-COMM-social-engineering-01 | Communication Tools → Social Engineering & Targeted Harms,24
+T4-EDU-misinformation-01 | Education → Misinformation & Deceptive Content,13

@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  mock-payment-server:
+    build:
+      context: .
+      dockerfile: payment_server/Dockerfile
+    container_name: mock-payment-server
+    ports:
+      - "8010:8010"
+    environment:
+      - PORT=8010
+      - HOST=0.0.0.0
+      - DEFAULT_SCENARIO=normal
+      - SCENARIOS_DIR=/app/payment_server/scenarios
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - mock-mcp-network
+
+networks:
+  mock-mcp-network:
+    driver: bridge

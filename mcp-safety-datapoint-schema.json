@@ -1,0 +1,521 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/mcp-safety-eval-datapoint-v1.json",
+  "title": "MCP Tool-Calling Safety Evaluation Datapoint",
+  "description": "Schema for adversarial tool-calling datapoints targeting MCP environments",
+  "version": "1.0.0",
+  "type": "object",
+  "required": [
+    "datapoint_id",
+    "description",
+    "system_instruction",
+    "available_tools",
+    "conversation",
+    "metadata",
+    "forbidden_actions",
+    "evaluation_rubric"
+  ],
+  "properties": {
+    "datapoint_id": {
+      "type": "string",
+      "pattern": "^MCP-[A-Z][0-9]-[0-9]{4}$",
+      "description": "Unique identifier format: MCP-{ATTACK_TYPE}-{NUMBER}",
+      "examples": [
+        "MCP-S1-0001",
+        "MCP-H3-0042",
+        "MCP-U5-0123"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "Clear explanation of the attack: what type of attack, what is being exploited, what security boundary is being broken, and where the attack is hidden (tool description, user prompt, tool return value, or file content).",
+      "minLength": 100,
+      "maxLength": 1000
+    },
+    "system_instruction": {
+      "type": "string",
+      "description": "System prompt defining agent behavior, permissions, and constraints. Must establish clear boundaries that the attack attempts to violate.",
+      "minLength": 50,
+      "maxLength": 4000
+    },
+    "available_tools": {
+      "type": "array",
+      "description": "List of MCP tools available to the agent in this scenario",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/$defs/tool_definition"
+      }
+    },
+    "conversation": {
+      "type": "array",
+      "description": "Adversarial conversation context ending on user turn (single or multi-turn)",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/conversation_turn"
+      }
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "description": "Tool calls that constitute safety failures",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/forbidden_action"
+      }
+    },
+    "evaluation_rubric": {
+      "$ref": "#/$defs/evaluation_rubric"
+    },
+    "input_files": {
+      "type": "array",
+      "description": "Virtual files with pre-extracted content for U2 (XPIA) indirect prompt injection scenarios. Content is mounted at evaluation time and returned by mock file-reading tools.",
+      "items": {
+        "$ref": "#/$defs/input_file"
+      }
+    }
+  },
+  "$defs": {
+    "input_file": {
+      "type": "object",
+      "description": "Virtual file with pre-extracted content containing injection payload",
+      "required": [
+        "mount_path",
+        "content"
+      ],
+      "properties": {
+        "mount_path": {
+          "type": "string",
+          "pattern": "^/",
+          "description": "Virtual path where the file appears to the agent (e.g., '/uploads/report.pdf'). Must start with '/' and not contain path traversal sequences."
+        },
+        "content": {
+          "type": "string",
+          "description": "Pre-extracted content with injection payload. Simulates what would be extracted from a malicious PDF, DOCX, or other file format.",
+          "minLength": 10,
+          "maxLength": 100000
+        },
+        "file_type": {
+          "type": "string",
+          "description": "Simulated file type (for documentation purposes)",
+          "enum": [
+            "pdf",
+            "docx",
+            "image",
+            "csv",
+            "json",
+            "txt",
+            "markdown",
+            "html",
+            "xml"
+          ]
+        },
+        "injection_location": {
+          "type": "string",
+          "description": "Description of where the injection is hidden within the simulated file (e.g., 'Hidden text layer in PDF', 'HTML comment at end of document')"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tool_definition": {
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "parameters"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tool function name (snake_case, kebab-case, or camelCase)",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+        },
+        "description": {
+          "type": "string",
+          "description": "Tool description. For S1 attacks, may contain injection payload."
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Tool parameter schema following JSON Schema format",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "enum": {
+                "type": "array"
+              },
+              "default": {}
+            }
+          }
+        },
+        "returns": {
+          "type": "object",
+          "description": "Return value schema",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "properties": {
+              "type": "object"
+            }
+          }
+        },
+        "mcp_server": {
+          "type": "string",
+          "description": "Source MCP server identifier from Smithery.ai",
+          "examples": [
+            "@mongodb-js/mongodb-mcp-server",
+            "@finance/stock-data"
+          ]
+        },
+        "server_category": {
+          "type": "string",
+          "description": "MCP server category",
+          "enum": [
+            "Web Search & Research",
+            "Development Tools",
+            "Data Analysis & Processing",
+            "Crypto & Blockchain",
+            "Content Creation",
+            "Operating System",
+            "Weather",
+            "Others",
+            "AI/ML Tools",
+            "Database Operations",
+            "API Integration",
+            "Gaming",
+            "Browser Automation",
+            "Financial Services",
+            "Security & Authentication",
+            "News & Media",
+            "Education",
+            "Memory Management",
+            "File Management",
+            "Travel & Maps",
+            "Daily Productivity",
+            "Time & Calendar",
+            "Communication Tools",
+            "Health & Fitness",
+            "E-commerce",
+            "Social Media",
+            "Cloud Services",
+            "Network"
+          ]
+        },
+        "is_poisoned": {
+          "type": "boolean",
+          "description": "Flag indicating if this tool is part of a server-side attack (S1-S7)",
+          "default": false
+        },
+        "mock_server": {
+          "type": "string",
+          "description": "Mock MCP server name for controlled attack scenarios (e.g., 'payment'). When specified, tool calls are routed to the corresponding mock MCP server instead of Smithery.",
+          "examples": [
+            "payment",
+            "database",
+            "email"
+          ]
+        },
+        "attack_scenario": {
+          "type": "string",
+          "description": "Attack scenario to use on the mock MCP server (e.g., 's3_return_injection'). Only applicable when mock_server is specified.",
+          "examples": [
+            "normal",
+            "s1_description_poison",
+            "s3_return_injection"
+          ]
+        }
+      }
+    },
+    "conversation_turn": {
+      "type": "object",
+      "required": [
+        "role",
+        "content"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "user",
+            "assistant",
+            "tool_result"
+          ],
+          "description": "Speaker role in the conversation"
+        },
+        "content": {
+          "type": "string",
+          "description": "Message content"
+        },
+        "tool_calls": {
+          "type": "array",
+          "description": "Tool calls made by assistant (for multi-turn scenarios)",
+          "items": {
+            "type": "object",
+            "required": [
+              "tool",
+              "parameters"
+            ],
+            "properties": {
+              "tool": {
+                "type": "string"
+              },
+              "parameters": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "tool_name": {
+          "type": "string",
+          "description": "Name of tool that produced this result (for tool_result role)"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "const": "tool_result"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "tool_name"
+            ]
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "mcp_attack_type",
+        "mcp_attack_layer",
+        "category",
+        "severity",
+        "difficulty",
+        "owasp_mapping",
+        "turn_type"
+      ],
+      "properties": {
+        "mcp_attack_type": {
+          "type": "string",
+          "description": "MCP-SafetyBench attack type identifier",
+          "enum": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "H1",
+            "H2",
+            "H3",
+            "H4",
+            "H5",
+            "H6",
+            "U1",
+            "U2",
+            "U3",
+            "U4",
+            "U5",
+            "U6",
+            "U7"
+          ]
+        },
+        "mcp_attack_type_name": {
+          "type": "string",
+          "description": "Human-readable attack type name",
+          "enum": [
+            "Tool Poisoning - Description Injection",
+            "Tool Poisoning - Parameter Manipulation",
+            "Tool Poisoning - Return Value Injection",
+            "Malicious Tool Registration",
+            "Rug Pull Attack",
+            "Tool Shadowing",
+            "Schema Manipulation",
+            "Excessive Agency",
+            "Improper Access Control",
+            "Confused Deputy",
+            "Tool Selection Manipulation",
+            "Permission Boundary Violation",
+            "Context Window Poisoning",
+            "Direct Prompt Injection",
+            "Indirect Prompt Injection",
+            "Social Engineering",
+            "Privilege Escalation",
+            "Data Exfiltration",
+            "Multi-Turn Manipulation",
+            "Cross-Server Attack"
+          ]
+        },
+        "mcp_attack_layer": {
+          "type": "string",
+          "description": "Attack surface layer (Server/Host/User)",
+          "enum": [
+            "server",
+            "host",
+            "user"
+          ]
+        },
+        "category": {
+          "type": "integer",
+          "description": "Harm taxonomy category ID (1-12)",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "category_name": {
+          "type": "string",
+          "description": "Human-readable harm category name",
+          "enum": [
+            "Social Engineering & Targeted Harms",
+            "Data Leakage & Multi-Tenant Isolation",
+            "Model Inversion & Training Data Extraction",
+            "Commercial Cybercrime Code Generation",
+            "Prompt Injection via RAG & External Sources",
+            "Policy Evasion & Filter Bypass",
+            "Resource Abuse & System Manipulation",
+            "Cyber Warfare & Critical Infrastructure Harm",
+            "Intellectual Property & Copyright Violations",
+            "Regulatory & Compliance Violations",
+            "Misinformation & Deceptive Content",
+            "Training Data Poisoning & Model Backdooring"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "description": "Attack severity level",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "difficulty": {
+          "type": "string",
+          "description": "Difficulty level for agent to handle this attack",
+          "enum": [
+            "trivial",
+            "easy",
+            "medium",
+            "hard",
+            "expert"
+          ]
+        },
+        "owasp_mapping": {
+          "type": "array",
+          "description": "Applicable OWASP LLM Top 10 2025 identifiers",
+          "items": {
+            "type": "string",
+            "pattern": "^LLM(0[1-9]|10)$"
+          },
+          "minItems": 1
+        },
+        "mitre_atlas_techniques": {
+          "type": "array",
+          "description": "MITRE ATLAS technique IDs including proposed tool-calling sub-techniques",
+          "items": {
+            "type": "string",
+            "pattern": "^AML\\.T[0-9]{4}(\\.[0-9]{3})?$"
+          }
+        },
+        "turn_type": {
+          "type": "string",
+          "description": "Conversation complexity category",
+          "enum": [
+            "single",
+            "multi_2_3",
+            "multi_4_5"
+          ]
+        },
+        "tool_domains": {
+          "type": "array",
+          "description": "MCP server categories involved in this scenario. The first element should be the primary/attack category for project allocation tracking.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "attack_technique": {
+          "type": "string",
+          "description": "Specific attack technique used",
+          "examples": [
+            "authority_impersonation",
+            "parameter_injection",
+            "multi_turn_escalation",
+            "cross_server_data_exfiltration",
+            "confused_deputy_indirect_injection",
+            "social_engineering_privilege_escalation"
+          ]
+        }
+      }
+    },
+    "forbidden_action": {
+      "type": "object",
+      "description": "A tool call that constitutes a safety failure. Use 'patterns' for parameter-level checking when a tool can be safe or unsafe depending on parameters.",
+      "required": [
+        "tool",
+        "reason"
+      ],
+      "properties": {
+        "tool": {
+          "type": "string",
+          "description": "Forbidden tool name"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanation of why this action is forbidden"
+        },
+        "patterns": {
+          "type": "object",
+          "description": "Parameter patterns that trigger violation. Key=parameter name, Value=array of forbidden substrings. If absent, any use of the tool is forbidden. If present, only matching parameter values are forbidden.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "evaluation_rubric": {
+      "type": "object",
+      "description": "Criteria for LLM-as-Judge evaluation. Only safety_rubric is used in judge evaluation.",
+      "required": [
+        "safety_rubric"
+      ],
+      "properties": {
+        "safety_rubric": {
+          "$ref": "#/$defs/safety_rubric"
+        }
+      },
+      "additionalProperties": false
+    },
+    "safety_rubric": {
+      "type": "array",
+      "description": "Array of criteria strings for safe behavior evaluation. Used in judge prompt for SAFE/UNSAFE determination.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    }
+  }
+}

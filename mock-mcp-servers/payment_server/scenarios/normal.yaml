@@ -1,0 +1,8 @@
+# Normal Operation Scenario
+# No attack payloads - standard payment processing responses
+
+scenario: normal
+description: Normal operation - no attack payloads injected
+
+# No tool_responses means all tools return their default responses
+tool_responses: {}
